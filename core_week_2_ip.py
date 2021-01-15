@@ -550,3 +550,107 @@ print(cm)
 print('Accuracy' , accuracy_score(y_test, y_pred))
 
 # There's no change in accuracy, therefore all features seem to be contributing to the results.
+
+"""### b) LDA (Linear Discriminate Analysis)"""
+
+x = Financial_encoding.drop(['has_bank_account', 'uniqueid'], axis= 1) # features
+y = Financial_encoding['has_bank_account'] #target variable
+
+# Split the data
+
+from sklearn.model_selection import train_test_split
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=0)
+
+# Feature Scaling
+
+from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()
+x_train = sc.fit_transform(x_train)
+x_test = sc.transform(x_test)
+
+# Peforming LDA
+# We have to pass the value for the n_components parameter of the LDA, 
+# which refers to the number of linear discriminates that we want to retrieve.
+
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
+lda = LDA(n_components=1)
+X_train = lda.fit_transform(x_train, y_train)
+X_test = lda.transform(x_test)
+
+# Training and Making Predictions
+
+from sklearn.ensemble import RandomForestClassifier
+
+classifier = RandomForestClassifier(max_depth=2, random_state=0)
+classifier.fit(X_train, y_train)
+y_pred = classifier.predict(X_test)
+
+# Evaluating the Performance
+
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import accuracy_score
+
+cm = confusion_matrix(y_test, y_pred)
+print(cm)
+print('Accuracy' + str(accuracy_score(y_test, y_pred)))
+
+# The accuracy with 1 LDA is higher than that with 1 PCA which had 85% accuracy.
+
+"""# IMPLEMENTING THE SOLUTION"""
+
+Bank_Account = Fin_No_Null[Fin_No_Null.has_bank_account == 'Yes']
+Bank_Account.head()
+
+Bank_Account.country.value_counts()
+
+# Kenyans have the most accounts
+
+Bank_Account.location_type.value_counts()
+
+# Location doesn't matter
+
+Bank_Account.cellphone_access.value_counts()
+
+# Most have a cell-phone
+
+Bank_Account.household_size.value_counts()
+
+# Generally, households with less people have more banking access
+
+Bank_Account.age_of_respondent.value_counts()
+
+# Generally, people between 28 - 40 years old have more banking access
+
+Bank_Account.gender_of_respondent.value_counts()
+
+# More males than feales have bank accounts
+
+Bank_Account.relationship_with_head.value_counts()
+
+# The heads of households have more acces to accounts
+
+Bank_Account.marital_status.value_counts()
+
+# Married/Living together people have more bank accounts
+
+Bank_Account.education_level.value_counts()
+
+# People with some form of education have more acces to bank accounts
+
+Bank_Account.job_type.value_counts()
+
+# Type of job affects the banking access
+
+Bank_Account.year.value_counts()
+
+# As expected, as the years progress, the access to banking improves.
+
+"""# CONCLUSION
+
+Location doesn’t matter (rural or urban) and could be the feature that we neglect in the prediction model. All the other factors affect the access to banking.
+
+# RECOMMENDATION
+
+For better analysis, more numerical values should be included in the data collection phase. Ideally, the categorical responses should be serialised in numbers so as to enable efficient analysis that will enable correlations to be realised better.
+"""
+
